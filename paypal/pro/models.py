@@ -47,7 +47,7 @@ class PayPalNVP(Model):
     flag = models.BooleanField(default=False, blank=True)
     flag_code = models.CharField(max_length=32, blank=True)
     flag_info = models.TextField(blank=True)    
-    ipaddress = models.IPAddressField(blank=True)
+    ipaddress = models.IPAddressField(blank=True, null=True)
     query = models.TextField(blank=True)
     response = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,9 +59,11 @@ class PayPalNVP(Model):
     
     def init(self, request, paypal_request, paypal_response):
         """Initialize a PayPalNVP instance from a HttpRequest."""
-        self.ipaddress = request.META.get('REMOTE_ADDR', '').split(':')[0]
-        if hasattr(request, "user") and request.user.is_authenticated():
-            self.user = request.user
+        
+        if request:
+            self.ipaddress = request.META.get('REMOTE_ADDR', '').split(':')[0]
+            if hasattr(request, "user") and request.user.is_authenticated():
+                self.user = request.user
 
         # No storing credit card info.
         query_data = dict((k,v) for k, v in paypal_request.iteritems() if k not in self.RESTRICTED_FIELDS)

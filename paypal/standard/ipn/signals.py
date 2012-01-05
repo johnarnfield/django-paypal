@@ -30,4 +30,5 @@ recurring_create = Signal()
 # recurring_payment
 recurring_payment = Signal()
 
+# administrator cancelled profile from paypal admin
 recurring_cancel = Signal()
