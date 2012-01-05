@@ -154,7 +154,11 @@ class PayPalWPP(object):
 
     def getRecurringPaymentsProfileDetails(self, params):
         defaults = {"method": "GetRecurringPaymentsProfileDetails"}
-        required = L("profileid")
+        required = []
+        
+        # Manually check for profile and ensure it's not None
+        if params.get('profileid', None) is None:
+            raise PayPalError("Missing required param: 'profileid'")   
         
         nvp_obj = self._fetch(params, required, defaults)
         if nvp_obj.flag:
@@ -230,17 +234,17 @@ class PayPalWPP(object):
             pprint.pprint(defaults)
             print '\nPayPal Response:'
             pprint.pprint(response_params)
-
+        
         # Gather all NVP parameters to pass to a new instance.
         nvp_params = {}
         for k, v in MergeDict(defaults, response_params).items():
             if k in NVP_FIELDS:
                 nvp_params[str(k)] = v
-
+        
         # PayPal timestamp has to be formatted.
         if 'timestamp' in nvp_params:
             nvp_params['timestamp'] = paypaltime2datetime(nvp_params['timestamp'])
-
+        
         nvp_obj = PayPalNVP(**nvp_params)
         nvp_obj.init(self.request, params, response_params)
         nvp_obj.save()

@@ -22,6 +22,8 @@ class PayPalNVP(Model):
     method = models.CharField(max_length=64, blank=True)
     ack = models.CharField(max_length=32, blank=True)    
     profilestatus = models.CharField(max_length=32, blank=True)
+    status = models.CharField(max_length=32, blank=True) # I suspect this is a paypal error duplicate of profilestatus
+                                                         # returned by calls to GetRecurringPaymentsProfileDetails
     timestamp = models.DateTimeField(blank=True, null=True)
     profileid = models.CharField(max_length=32, blank=True)  # I-E596DFUSD882
     profilereference = models.CharField(max_length=128, blank=True)  # PROFILEREFERENCE
