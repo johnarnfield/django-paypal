@@ -34,7 +34,7 @@ class PaymentForm(forms.Form):
                 nvp_obj = wpp.doDirectPayment(params)
             # Create recurring payment:
             else:
-                nvp_obj = wpp.createRecurringPaymentsProfile(params, direct=True)
+                nvp_obj = wpp.createRecurringPaymentsProfile(params, direct=True, request=request)
         except PayPalFailure:
             return False
         return True

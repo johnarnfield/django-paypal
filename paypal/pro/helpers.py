@@ -95,7 +95,7 @@ class PayPalWPP(object):
             raise PayPalFailure(nvp_obj.flag_info)
         return nvp_obj
 
-    def doExpressCheckoutPayment(self, params):
+    def doExpressCheckoutPayment(self, params, request=None):
         """
         Check the dude out:
         """
@@ -104,10 +104,10 @@ class PayPalWPP(object):
         nvp_obj = self._fetch(params, required, defaults)
         if nvp_obj.flag:
             raise PayPalFailure(nvp_obj.flag_info)
-        payment_was_successful.send(sender=self, nvp_obj=nvp_obj, params=params)
+        payment_was_successful.send(sender=self, nvp_obj=nvp_obj, params=params, request=request)
         return nvp_obj
         
-    def createRecurringPaymentsProfile(self, params, direct=False):
+    def createRecurringPaymentsProfile(self, params, direct=False, request=None):
         """
         Set direct to True to indicate that this is being called as a directPayment.
         Returns True PayPal successfully creates the profile otherwise False.
@@ -126,7 +126,7 @@ class PayPalWPP(object):
         # Flag if profile_type != ActiveProfile
         if nvp_obj.flag:
             raise PayPalFailure(nvp_obj.flag_info)
-        payment_profile_created.send(sender=self, nvp_obj=nvp_obj, params=params)
+        payment_profile_created.send(sender=self, nvp_obj=nvp_obj, params=params, request=request)
         return nvp_obj
 
     def getExpressCheckoutDetails(self, params):
@@ -177,7 +177,7 @@ class PayPalWPP(object):
     def billOutstandingAmount(self, params):
         raise NotImplementedError
         
-    def manangeRecurringPaymentsProfileStatus(self, params, fail_silently=False):
+    def manangeRecurringPaymentsProfileStatus(self, params, fail_silently=False, request=None):
         """
         Requires `profileid` and `action` params.
         Action must be either "Cancel", "Suspend", or "Reactivate".
@@ -190,11 +190,11 @@ class PayPalWPP(object):
         # TODO: This fail silently check should be using the error code, but its not easy to access
         if not nvp_obj.flag or (fail_silently and nvp_obj.flag_info == 'Invalid profile status for cancel action; profile should be active or suspended'):
             if params['action'] == 'Cancel':
-                recurring_cancel.send(sender=self, nvp_obj=nvp_obj, params=params)
+                recurring_cancel.send(sender=self, nvp_obj=nvp_obj, params=params, request=request)
             elif params['action'] == 'Suspend':
-                recurring_suspend.send(sender=self, nvp_obj=nvp_obj, params=params)
+                recurring_suspend.send(sender=self, nvp_obj=nvp_obj, params=params, request=request)
             elif params['action'] == 'Reactivate':
-                recurring_reactivate.send(sender=self, nvp_obj=nvp_obj, params=params)
+                recurring_reactivate.send(sender=self, nvp_obj=nvp_obj, params=params, request=request)
         else:
             raise PayPalFailure(nvp_obj.flag_info)
         return nvp_obj
