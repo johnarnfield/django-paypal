@@ -224,6 +224,23 @@ class PayPalStandardBase(Model):
     def is_recurring_cancel(self):
         return self.txn_type == "recurring_payment_profile_cancel"
     
+    def get_txn_type_display(self):
+        type =  {
+            'subscr_cancel': 'Subscription Cancelled',
+            'subscr_eot': 'End of Subscription Term',
+            'subscr_cancel': 'Subscription Changed',
+            'recurring_payment_profile_created': 'Subscription Created',
+            'recurring_payment': 'Payment Successfully Processed',
+            'recurring_payment_profile_cancel': 'Subscription Cancelled'
+        }.get(self.txn_type)
+        
+        if type:
+            return type
+        
+        return {
+            'Refunded': 'Refund'
+        }.get(self.payment_status, "Unknown")
+    
     def set_flag(self, info, code=None):
         """Sets a flag on the transaction and also sets a reason."""
         self.flag = True
